@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v8.5 (Static)</title>
+    <title>GLA Boar Elite v9.5 (Secure Sync)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #1E293B; }
-        /* v8.5 核心樣式復刻 */
         .status-box {
             background: white !important; padding: 15px; border-radius: 10px; flex: 1;
             text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
@@ -24,20 +23,19 @@
 
     <div class="text-center text-white p-8 mb-6 rounded-xl shadow-lg bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6]">
         <h1 class="text-3xl font-extrabold tracking-tight">GLA BOAR PERFORMANCE ANALYTICS</h1>
-        <p class="opacity-80 text-sm mt-2 font-semibold">PhD Standard Swine Breeding Dashboard (Permanently Online)</p>
+        <p class="opacity-80 text-sm mt-2 font-semibold">PhD Standard Swine Breeding Dashboard (API Secured Link)</p>
     </div>
 
     <div class="flex justify-center mb-8">
         <div class="w-full max-w-md">
             <label class="block text-center text-sm font-bold text-slate-700 mb-2">SEARCH BOAR ID / CARI ID BOAR</label>
-            <input type="text" id="searchInput" oninput="executeSearch()" class="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-center" placeholder="Enter ID or Number (e.g., 1397 or D1397)...">
+            <input type="text" id="searchInput" oninput="executeSearch()" class="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-center" placeholder="Enter ID or Number (e.g., 1397)...">
         </div>
     </div>
 
     <div id="statusMessage" class="hidden text-center p-4 rounded-lg font-semibold my-4"></div>
 
     <div id="resultsArea" class="hidden">
-        
         <h2 class="section-title">I. BOAR GRADE & INFORMATION / GRED & MAKLUMAT BOAR</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="status-box">
@@ -53,7 +51,7 @@
                 <div class="mt-1"><span id="tileGrade" class="bg-[#1E3A8A] text-white px-3 py-1 rounded-full font-bold text-lg">-</span></div>
             </div>
             <div class="status-box strategy-box">
-                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Management Strategy / Strategi Pengurusan</div>
+                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Management Strategy</div>
                 <div id="tileStrategy" class="text-lg font-extrabold text-emerald-600">-</div>
             </div>
         </div>
@@ -61,7 +59,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
                 <div class="text-xs text-slate-500 font-bold uppercase">Average TSO</div>
-                <div id="kpiTso" class="text-2xl font-black text-[#1E3A8A] mt-1">0.0</div>
+                <div id="kpiTso" class="text-2xl font-black text-[#1E3A8A] mt-1">0</div>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
                 <div class="text-xs text-slate-500 font-bold uppercase">Mated / Mengawan</div>
@@ -95,21 +93,18 @@
                         <th class="p-3 text-sm">Other Record / Rekod Lain</th>
                     </tr>
                 </thead>
-                <tbody id="extractionTableBody" class="divide-y divide-slate-100">
-                    </tbody>
+                <tbody id="extractionTableBody" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // 資料來源對接核心
-        const GRADE_URL = "https://docs.google.com/spreadsheets/d/1vK71OXZum2NrDkAPktOVz01-sXoETcdxdrBgC4jtc-c/export?format=csv&gid=0";
-        const SEMEN_URL = "https://docs.google.com/spreadsheets/d/1qvo4INF0LZjA2u49grKW_cHeEPJO48_dk6gOlXoMgaM/export?format=csv&gid=1428367761";
+        // 解鎖核心：改用 gviz/tq 並注入動態緩存刷新，繞過 GitHub Pages 跨域限制
+        const SHEET_ID = "1qvo4INF0LZjA2u49grKW_cHeEPJO48_dk6gOlXoMgaM";
+        const BOAR_TAB_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=1428367761&cache_bust=${Date.now()}`;
 
-        let gradeDatabase = [];
-        let semenDatabase = [];
+        let rawDataset = [];
 
-        // 數值清洗，強制整數化（防呆處理）
         function formatToInt(val) {
             if (val === undefined || val === null || val.toString().trim() === "" || val === "-") return "0";
             let cleanVal = val.toString().replace('%', '').trim();
@@ -117,7 +112,7 @@
             return !isNaN(num) ? Math.round(num).toString() : val.toString();
         }
 
-        // CSV 數據高精度解析器
+        // 高精準度 CSV 切片解析器
         function parseCSV(text) {
             let lines = text.split(/\r\n|\n/);
             return lines.map(line => {
@@ -135,22 +130,21 @@
             });
         }
 
-        // 異步併發快取下載引擎
+        // 異步初始同步模組
         async function initApplication() {
-            showGlobalStatus("Downloading real-time dashboard from Google Sheets...", "bg-blue-100 text-blue-800");
+            showGlobalStatus("Securing API Link with GLA Farm Information...", "bg-blue-100 text-blue-800");
             try {
-                const [gradeRes, semenRes] = await Promise.all([
-                    fetch(GRADE_URL).then(r => r.text()),
-                    fetch(SEMEN_URL).then(r => r.text())
-                ]);
+                const response = await fetch(BOAR_TAB_URL).then(r => r.text());
+                rawDataset = parseCSV(response);
 
-                gradeDatabase = parseCSV(gradeRes);
-                semenDatabase = parseCSV(semenRes);
-
-                showGlobalStatus("System Live. 24H Connection Established.", "bg-emerald-100 text-emerald-800");
-                setTimeout(() => { document.getElementById("statusMessage").classList.add("hidden"); }, 2000);
+                if (rawDataset.length > 2) {
+                    showGlobalStatus("System Live. 24H Connection Unlocked.", "bg-emerald-100 text-emerald-800");
+                    setTimeout(() => { document.getElementById("statusMessage").classList.add("hidden"); }, 2000);
+                } else {
+                    showGlobalStatus("Warning: Retrieved database format error.", "bg-amber-100 text-amber-800");
+                }
             } catch (error) {
-                showGlobalStatus("Database connection failed. Please refresh page.", "bg-rose-100 text-rose-800");
+                showGlobalStatus("API Connection blocked by browser. Check document share options.", "bg-rose-100 text-rose-800");
                 console.error(error);
             }
         }
@@ -162,7 +156,7 @@
             el.classList.remove("hidden");
         }
 
-        // 高彈性模糊搜尋與無字母相容邏輯
+        // 無字母模糊查詢核心
         function executeSearch() {
             const query = document.getElementById("searchInput").value.trim().toLowerCase();
             const resultsArea = document.getElementById("resultsArea");
@@ -173,37 +167,35 @@
                 return;
             }
 
-            // 1. 檢索表一 (Grade Info 分頁) -> 絕對物理切片 V:AD (21-29)
-            // 耳號搜尋基準點鎖定在 23 欄 (X欄)
-            let gradeRows = gradeDatabase.slice(2); // 跳過前兩行標題
-            let matchedGradeRow = gradeRows.find(row => row[23] && row[23].toLowerCase().includes(query));
+            // 數據行跳過前兩行標題列
+            let dataRows = rawDataset.slice(2); 
+
+            // 表一搜尋：鎖定索引 23 (X 欄，Tag ID)，採包含匹配達成無字母搜尋 (如輸入 1397 匹配 D1397)
+            let matchedGradeRow = dataRows.find(row => row[23] && row[23].toLowerCase().includes(query));
 
             if (matchedGradeRow) {
                 statusMessage.classList.add("hidden");
                 resultsArea.classList.remove("hidden");
 
-                // 渲染四大狀態框
+                // 表一數據渲染
                 document.getElementById("tileId").innerText = matchedGradeRow[23] || "N/A";
                 document.getElementById("tileBreed").innerText = matchedGradeRow[22] || "N/A";
                 document.getElementById("tileGrade").innerText = matchedGradeRow[21] || "N/A";
                 document.getElementById("tileStrategy").innerText = matchedGradeRow[25] || "N/A";
                 
-                // 渲染 KPI 數據列（強制整數化防呆）
                 document.getElementById("kpiTso").innerText = formatToInt(matchedGradeRow[26]);
                 document.getElementById("kpiMated").innerText = formatToInt(matchedGradeRow[27]);
                 document.getElementById("kpiCr").innerText = formatToInt(matchedGradeRow[28]) + "%";
                 document.getElementById("kpiBirthWt").innerText = formatToInt(matchedGradeRow[29]);
 
-                // 2. 檢索表二 (Semen 分頁 A:K 區塊)
-                // 搜尋基準點鎖定在 C 欄 (索引 2，Boar Ear Tag)
-                let semenRows = semenDatabase.slice(2);
-                let matchedSemenRows = semenRows.filter(row => row[2] && row[2].toLowerCase().includes(query));
+                // 表二搜尋：切換至 A:K 範圍，搜尋欄位鎖定在索引 2 (C 欄，Boar Ear Tag)
+                let matchedSemenRows = dataRows.filter(row => row[2] && row[2].toLowerCase().includes(query));
 
                 const tbody = document.getElementById("extractionTableBody");
                 tbody.innerHTML = "";
 
                 if (matchedSemenRows.length > 0) {
-                    // 按採精日期 (索引 0) 進行降冪排序，並取最近 10 次
+                    // 依據 Date (索引 0) 進行日期降冪排序，確保最新的在最上面，並嚴格切片取前 10 筆
                     matchedSemenRows.sort((a, b) => new Date(b[0]) - new Date(a[0]));
                     let top10 = matchedSemenRows.slice(0, 10);
 
@@ -211,26 +203,26 @@
                         let tr = document.createElement("tr");
                         tr.className = "hover:bg-slate-50 transition-colors";
                         
-                        // 嚴格對接 11 個目標欄位
+                        // 嚴格對接 A:K 的 11 個目標欄位
                         let cells = [
                             row[0] || "-", // Date
                             row[1] || "-", // Breed
-                            row[2] || "-", // Boar ID
-                            formatToInt(row[3]), // Vol Collected
-                            row[4] || "-", // Odor
-                            row[5] || "-", // Color
-                            formatToInt(row[6]), // Vitality
+                            row[2] || "-", // Boar Ear Tag
+                            formatToInt(row[3]), // Volume Collected (ml)
+                            row[4] || "-", // Bau [Odor]
+                            row[5] || "-", // warna [Color]
+                            formatToInt(row[6]), // aktiviti Vitality
                             formatToInt(row[7]), // Concentration
-                            formatToInt(row[8]), // Impurities
-                            formatToInt(row[9]), // Diluted Vol
-                            row[10] || "-" // Other Record
+                            formatToInt(row[8]), // Morphology Impurities
+                            formatToInt(row[9]), // Volume After Dilution
+                            row[10] || "-" // Other record
                         ];
 
                         tr.innerHTML = cells.map(cell => `<td class="p-3 text-slate-700">${cell}</td>`).join('');
                         tbody.appendChild(tr);
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-slate-400 font-semibold bg-slate-50">No extraction history found / Tiada rekod sejarah untuk baka ini.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-slate-400 font-semibold bg-slate-50">No extraction history found / Tiada rekod sejarah untuk ID ini.</td></tr>`;
                 }
             } else {
                 resultsArea.classList.add("hidden");
