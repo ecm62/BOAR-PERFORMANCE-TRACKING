@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v9.5 (Final)</title>
+    <title>GLA Boar Elite v9.8 (Mobile Optimized)</title>
     <style>
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
@@ -42,20 +42,28 @@
             border-left: 6px solid #1E3A8A; padding-left: 15px;
             color: #1E3A8A; font-weight: 800; font-size: 20px; margin-bottom: 15px;
         }
+        
+        /* ==========================================================
+           電腦端：5 個方塊併排成完整的一行 (5 欄均分)
+           ========================================================== */
         .status-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 15px; 
+            margin-bottom: 20px;
         }
         .status-box {
             background: white; padding: 15px; border-radius: 10px; text-align: center; 
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; border-top: 4px solid #3B82F6;
+            display: flex; flex-direction: column; justify-content: center; min-height: 70px;
         }
         .status-label { font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
         .status-value { font-size: 18px; color: #1E3A8A; font-weight: 800; }
-        .strategy-box { background-color: #EFF6FF !important; border-top-color: #10B981 !important; }
         
+        /* 特殊高亮色調 */
+        .strategy-box { background-color: #EFF6FF !important; border-top-color: #10B981 !important; }
+        .kpi-box { background-color: #F8FAFC !important; border-top-color: #6366F1 !important; }
         .badge-grade { background-color: #1E3A8A; color: #FFFFFF; padding: 2px 12px; border-radius: 15px; font-weight: bold; }
-
-        .kpi-container { background: white; padding: 15px; border-radius: 10px; display: inline-block; min-width: 180px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
         #historyModule { display: none; }
         .table-container { 
@@ -73,6 +81,22 @@
             color: #991B1B !important; padding: 15px; border-radius: 8px;
             font-weight: bold; text-align: center; margin-bottom: 20px;
         }
+
+        /* ==========================================================
+           手機端 (螢幕寬度 768px 以下)：精確實現「上三、下二」美觀網格
+           ========================================================== */
+        @media (max-width: 768px) {
+            .status-grid {
+                grid-template-columns: repeat(6, 1fr); /* 採用 6 等分基底公倍數 */
+            }
+            /* 前三個方塊 (Tag ID, Breed, Grade) 各佔 2 欄，剛好拼滿第一行 (2x3=6) */
+            .box-1, .box-2, .box-3 { grid-column: span 2; }
+            /* 後兩個方塊 (Strategy, Average TSO) 各佔 3 欄，剛好拼滿第二行 (3x2=6) */
+            .box-4, .box-5 { grid-column: span 3; }
+            
+            .status-box { padding: 12px 5px; min-height: 60px; }
+            .status-value { font-size: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -85,7 +109,7 @@
 
     <div class="search-section">
         <input type="text" id="tagInput" placeholder="SEARCH BOAR ID / CARI ID BOAR (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
-        <button id="searchBtn" onclick=" doSearch()">SEARCH</button>
+        <button id="searchBtn" onclick="doSearch()">SEARCH</button>
         <div id="status">System Secure & Ready</div>
     </div>
 
@@ -94,16 +118,11 @@
     <div id="gradeModule">
         <div class="section-title">I. BOAR GRADE & STRATEGY</div>
         <div class="status-grid">
-            <div class="status-box"><div class="status-label">TAG ID</div><div class="status-value" id="tileId">-</div></div>
-            <div class="status-box"><div class="status-label">BREED</div><div class="status-value" id="tileBreed">-</div></div>
-            <div class="status-box"><div class="status-label">GRADE</div><div class="status-value"><span class="badge-grade" id="tileGrade">-</span></div></div>
-            <div class="status-box strategy-box"><div class="status-label">MANAGEMENT STRATEGY</div><div class="status-value" id="tileStrategy" style="color: #10B981;">-</div></div>
-        </div>
-        
-        <div class="section-title">PERFORMANCE KPI</div>
-        <div class="kpi-container">
-            <div class="status-label">Average TSO</div>
-            <div class="status-value" id="kpiTso" style="font-size: 24px;">0</div>
+            <div class="status-box box-1"><div class="status-label">TAG ID</div><div class="status-value" id="tileId">-</div></div>
+            <div class="status-box box-2"><div class="status-label">BREED</div><div class="status-value" id="tileBreed">-</div></div>
+            <div class="status-box box-3"><div class="status-label">GRADE</div><div class="status-value"><span class="badge-grade" id="tileGrade">-</span></div></div>
+            <div class="status-box box-4 strategy-box"><div class="status-label">MANAGEMENT STRATEGY</div><div class="status-value" id="tileStrategy" style="color: #10B981;">-</div></div>
+            <div class="status-box box-5 kpi-box"><div class="status-label">AVERAGE TSO</div><div class="status-value" id="kpiTso" style="color: #6366F1;">-</div></div>
         </div>
     </div>
 
@@ -123,7 +142,7 @@
 </div>
 
 <script>
-    // 鎖定 2026年6月3日 上午 9:47 發布的第 10 版最新網址
+    // 對接您第 10 版正確運行的後端 GAS 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbzclqTypZTPTfgfOYw-OmyNhGelYUm7iKxDTZLBVP7huzW7t47UUOwbOtQrSf3bGWAy/exec"; 
 
     function doSearch() {
@@ -155,12 +174,11 @@
             statusDiv.style.color = "#10B981";
             statusDiv.textContent = "Data Successfully Verified.";
 
-            // 診斷防呆警示
             if (!json.gradeData && json.historyData && json.historyData.length > 0) {
                 diagContainer.innerHTML = `<div class="diagnostic-alert">⚠️ [DATABASE ALERT] Boar found in Extraction Logs, but BOAR_GRADE_CUMULATIVE sheet has NO data for this ID.</div>`;
             }
 
-            // 渲染公豬表一（4大狀態卡與 Avg TSO）
+            // 渲染看板（包含 TSO）
             if (json.gradeData) {
                 document.getElementById('tileId').textContent = json.gradeData.tagId;
                 document.getElementById('tileBreed').textContent = json.gradeData.breed;
@@ -170,7 +188,7 @@
                 document.getElementById('gradeModule').style.display = 'block';
             }
             
-            // 渲染公豬表二（最近20次歷史紀錄）
+            // 渲染歷史表格
             if (json.historyData && json.historyData.length > 0) {
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = json.historyData.map(row => `
