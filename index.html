@@ -3,234 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v9.5 (Secure Sync)</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>GLA Boar Elite v8.5 (Static)</title>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #1E293B; }
-        .status-box {
-            background: white !important; padding: 15px; border-radius: 10px; flex: 1;
-            text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid #E2E8F0; border-top: 4px solid #3B82F6;
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background-color: #F8FAFC; padding: 20px; margin: 0; 
+            display: flex; flex-direction: column; align-items: center; 
+            color: #1E293B; 
         }
-        .strategy-box { background-color: #EFF6FF !important; border-top: 4px solid #10B981 !important; }
-        .section-title { border-left: 6px solid #1E3A8A; padding-left: 15px; color: #1E3A8A; font-weight: 800; font-size: 20px; margin: 30px 0 15px 0; }
-        th { background-color: #F1F5F9 !important; color: #1E3A8A !important; font-weight: 700; text-align: center !important; }
-        td { text-align: center !important; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+        .container { width: 100%; max-width: 1400px; }
+        
+        .main-header {
+            text-align: center; color: #FFFFFF; padding: 25px;
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        
+        .search-section { 
+            background: white; padding: 20px; border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 25px; 
+        }
+        input { 
+            padding: 12px 15px; font-size: 16px; flex: 1; 
+            border: 1px solid #CBD5E1; border-radius: 8px; text-transform: uppercase;
+            font-weight: bold; text-align: center;
+        }
+        button { 
+            padding: 12px 25px; background: #1E3A8A; color: white; 
+            border: none; cursor: pointer; font-weight: bold; border-radius: 8px; transition: 0.3s;
+        }
+        button:hover { background: #1E40AF; transform: translateY(-1px); }
+        #status { font-weight: 600; font-size: 14px; color: #64748B; margin-left: auto; }
+
+        #gradeModule { display: none; margin-bottom: 30px; }
+        .section-title {
+            border-left: 6px solid #1E3A8A; padding-left: 15px;
+            color: #1E3A8A; font-weight: 800; font-size: 20px; margin-bottom: 15px;
+        }
+        .status-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;
+        }
+        .status-box {
+            background: white; padding: 15px; border-radius: 10px; text-align: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; border-top: 4px solid #3B82F6;
+        }
+        .status-label { font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .status-value { font-size: 18px; color: #1E3A8A; font-weight: 800; }
+        .strategy-box { background-color: #EFF6FF !important; border-top-color: #10B981 !important; }
+        
+        .badge-grade { background-color: #1E3A8A; color: #FFFFFF; padding: 2px 12px; border-radius: 15px; font-weight: bold; }
+
+        .kpi-container { background: white; padding: 15px; border-radius: 10px; display: inline-block; min-width: 180px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        #historyModule { display: none; }
+        .table-container { 
+            background: white; padding: 10px; border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; 
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
+        th { background-color: #F8FAFC; color: #1E3A8A; padding: 12px; border-bottom: 2px solid #E2E8F0; text-align: center; }
+        td { padding: 12px; text-align: center; border-bottom: 1px solid #F1F5F9; color: #334155; font-family: monospace; }
+        tr:hover { background-color: #F8FAFC; }
+        .hl-numeric { font-weight: bold; color: #2563EB; }
     </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto">
+<body>
 
-    <div class="text-center text-white p-8 mb-6 rounded-xl shadow-lg bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6]">
-        <h1 class="text-3xl font-extrabold tracking-tight">GLA BOAR PERFORMANCE ANALYTICS</h1>
-        <p class="opacity-80 text-sm mt-2 font-semibold">PhD Standard Swine Breeding Dashboard (API Secured Link)</p>
+<div class="container">
+    <div class="main-header">
+        <h1>GLA BOAR PERFORMANCE ANALYTICS</h1>
+        <p style="opacity: 0.8; font-size: 14px; font-weight: 500;">PhD Standard Swine Breeding Dashboard (Permanently Online)</p>
     </div>
 
-    <div class="flex justify-center mb-8">
-        <div class="w-full max-w-md">
-            <label class="block text-center text-sm font-bold text-slate-700 mb-2">SEARCH BOAR ID / CARI ID BOAR</label>
-            <input type="text" id="searchInput" oninput="executeSearch()" class="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-center" placeholder="Enter ID or Number (e.g., 1397)...">
+    <div class="search-section">
+        <input type="text" id="tagInput" placeholder="SEARCH BOAR ID / CARI ID BOAR (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
+        <button id="searchBtn" onclick="doSearch()">SEARCH</button>
+        <div id="status">System Secure & Ready</div>
+    </div>
+
+    <div id="gradeModule">
+        <div class="section-title">I. BOAR GRADE & STRATEGY</div>
+        <div class="status-grid">
+            <div class="status-box"><div class="status-label">TAG ID</div><div class="status-value" id="tileId">-</div></div>
+            <div class="status-box"><div class="status-label">BREED</div><div class="status-value" id="tileBreed">-</div></div>
+            <div class="status-box"><div class="status-label">GRADE</div><div class="status-value"><span class="badge-grade" id="tileGrade">-</span></div></div>
+            <div class="status-box strategy-box"><div class="status-label">MANAGEMENT STRATEGY</div><div class="status-value" id="tileStrategy" style="color: #10B981;">-</div></div>
+        </div>
+        
+        <div class="section-title">PERFORMANCE KPI</div>
+        <div class="kpi-container">
+            <div class="status-label">Average TSO</div>
+            <div class="status-value" id="kpiTso" style="font-size: 24px;">0</div>
         </div>
     </div>
 
-    <div id="statusMessage" class="hidden text-center p-4 rounded-lg font-semibold my-4"></div>
-
-    <div id="resultsArea" class="hidden">
-        <h2 class="section-title">I. BOAR GRADE & INFORMATION / GRED & MAKLUMAT BOAR</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="status-box">
-                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Tag ID / No. Tag</div>
-                <div id="tileId" class="text-xl font-extrabold text-[#1E3A8A]">-</div>
-            </div>
-            <div class="status-box">
-                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Breed / Baka</div>
-                <div id="tileBreed" class="text-xl font-extrabold text-[#1E3A8A]">-</div>
-            </div>
-            <div class="status-box">
-                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Grade / Gred</div>
-                <div class="mt-1"><span id="tileGrade" class="bg-[#1E3A8A] text-white px-3 py-1 rounded-full font-bold text-lg">-</span></div>
-            </div>
-            <div class="status-box strategy-box">
-                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Management Strategy</div>
-                <div id="tileStrategy" class="text-lg font-extrabold text-emerald-600">-</div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-                <div class="text-xs text-slate-500 font-bold uppercase">Average TSO</div>
-                <div id="kpiTso" class="text-2xl font-black text-[#1E3A8A] mt-1">0</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-                <div class="text-xs text-slate-500 font-bold uppercase">Mated / Mengawan</div>
-                <div id="kpiMated" class="text-2xl font-black text-[#1E3A8A] mt-1">0</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-                <div class="text-xs text-slate-500 font-bold uppercase">CR % / Kadar受胎</div>
-                <div id="kpiCr" class="text-2xl font-black text-[#1E3A8A] mt-1">0%</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-                <div class="text-xs text-slate-500 font-bold uppercase">Avg Birth Wt / Berat Lahir</div>
-                <div id="kpiBirthWt" class="text-2xl font-black text-[#1E3A8A] mt-1">0</div>
-            </div>
-        </div>
-
-        <h2 class="section-title">II. RECENT 10 EXTRACTIONS / 10 REKOD PENGUMPULAN TERKINI (A:K)</h2>
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
-            <table class="w-full border-collapse">
+    <div id="historyModule">
+        <div class="section-title">II. RECENT EXTRACTION DATA (TOP 20)</div>
+        <div class="table-container">
+            <table>
                 <thead>
-                    <tr class="border-b border-slate-200">
-                        <th class="p-3 text-sm">Date / Tarikh</th>
-                        <th class="p-3 text-sm">Breed / Baka</th>
-                        <th class="p-3 text-sm">Boar ID / No. Tag</th>
-                        <th class="p-3 text-sm">Vol(ml) Collected</th>
-                        <th class="p-3 text-sm">Odor / Bau</th>
-                        <th class="p-3 text-sm">Color / Warna</th>
-                        <th class="p-3 text-sm">Vitality / Aktiviti</th>
-                        <th class="p-3 text-sm">Concentration</th>
-                        <th class="p-3 text-sm">Impurities (%)</th>
-                        <th class="p-3 text-sm">Diluted Vol(ml)</th>
-                        <th class="p-3 text-sm">Other Record / Rekod Lain</th>
+                    <tr>
+                        <th>Date</th><th>Breed</th><th>ID</th><th>Vol(ml)</th><th>Odor</th><th>Color</th><th>Vit</th><th>Conc</th><th>Imp%</th><th>Diluted</th><th>Other Record</th>
                     </tr>
                 </thead>
-                <tbody id="extractionTableBody" class="divide-y divide-slate-100"></tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
     </div>
+</div>
 
-    <script>
-        // 解鎖核心：改用 gviz/tq 並注入動態緩存刷新，繞過 GitHub Pages 跨域限制
-        const SHEET_ID = "1qvo4INF0LZjA2u49grKW_cHeEPJO48_dk6gOlXoMgaM";
-        const BOAR_TAB_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=1428367761&cache_bust=${Date.now()}`;
+<script>
+    // ⚠️ 請將此處置換為您第一步新部署獲得的「公豬專用跨表聯檢」GAS 網址
+    const API_URL = "https://script.google.com/macros/s/您的全新部署ID/exec"; 
 
-        let rawDataset = [];
+    function doSearch() {
+        const input = document.getElementById('tagInput').value.trim();
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('searchBtn');
 
-        function formatToInt(val) {
-            if (val === undefined || val === null || val.toString().trim() === "" || val === "-") return "0";
-            let cleanVal = val.toString().replace('%', '').trim();
-            let num = parseFloat(cleanVal);
-            return !isNaN(num) ? Math.round(num).toString() : val.toString();
-        }
+        if(!input) return;
+        
+        btn.disabled = true;
+        statusDiv.style.color = "#EAB308";
+        statusDiv.textContent = "Connecting to Data Warehouse...";
+        
+        document.getElementById('gradeModule').style.display = 'none';
+        document.getElementById('historyModule').style.display = 'none';
 
-        // 高精準度 CSV 切片解析器
-        function parseCSV(text) {
-            let lines = text.split(/\r\n|\n/);
-            return lines.map(line => {
-                let result = [];
-                let current = '';
-                let inQuotes = false;
-                for (let i = 0; i < line.length; i++) {
-                    let char = line[i];
-                    if (char === '"') { inQuotes = !inQuotes; }
-                    else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-                    else { current += char; }
-                }
-                result.push(current.trim());
-                return result;
-            });
-        }
-
-        // 異步初始同步模組
-        async function initApplication() {
-            showGlobalStatus("Securing API Link with GLA Farm Information...", "bg-blue-100 text-blue-800");
-            try {
-                const response = await fetch(BOAR_TAB_URL).then(r => r.text());
-                rawDataset = parseCSV(response);
-
-                if (rawDataset.length > 2) {
-                    showGlobalStatus("System Live. 24H Connection Unlocked.", "bg-emerald-100 text-emerald-800");
-                    setTimeout(() => { document.getElementById("statusMessage").classList.add("hidden"); }, 2000);
-                } else {
-                    showGlobalStatus("Warning: Retrieved database format error.", "bg-amber-100 text-amber-800");
-                }
-            } catch (error) {
-                showGlobalStatus("API Connection blocked by browser. Check document share options.", "bg-rose-100 text-rose-800");
-                console.error(error);
-            }
-        }
-
-        function showGlobalStatus(msg, classes) {
-            const el = document.getElementById("statusMessage");
-            el.className = `p-4 rounded-lg font-semibold my-4 text-center ${classes}`;
-            el.innerText = msg;
-            el.classList.remove("hidden");
-        }
-
-        // 無字母模糊查詢核心
-        function executeSearch() {
-            const query = document.getElementById("searchInput").value.trim().toLowerCase();
-            const resultsArea = document.getElementById("resultsArea");
-            const statusMessage = document.getElementById("statusMessage");
-
-            if (!query) {
-                resultsArea.classList.add("hidden");
+        fetch(`${API_URL}?tag=${encodeURIComponent(input)}`)
+        .then(res => res.json())
+        .then(json => {
+            btn.disabled = false;
+            if (json.error) {
+                statusDiv.style.color = "#EF4444";
+                statusDiv.textContent = `Error: ${json.error}`;
                 return;
             }
 
-            // 數據行跳過前兩行標題列
-            let dataRows = rawDataset.slice(2); 
+            statusDiv.style.color = "#10B981";
+            statusDiv.textContent = "Data Successfully Verified.";
 
-            // 表一搜尋：鎖定索引 23 (X 欄，Tag ID)，採包含匹配達成無字母搜尋 (如輸入 1397 匹配 D1397)
-            let matchedGradeRow = dataRows.find(row => row[23] && row[23].toLowerCase().includes(query));
-
-            if (matchedGradeRow) {
-                statusMessage.classList.add("hidden");
-                resultsArea.classList.remove("hidden");
-
-                // 表一數據渲染
-                document.getElementById("tileId").innerText = matchedGradeRow[23] || "N/A";
-                document.getElementById("tileBreed").innerText = matchedGradeRow[22] || "N/A";
-                document.getElementById("tileGrade").innerText = matchedGradeRow[21] || "N/A";
-                document.getElementById("tileStrategy").innerText = matchedGradeRow[25] || "N/A";
-                
-                document.getElementById("kpiTso").innerText = formatToInt(matchedGradeRow[26]);
-                document.getElementById("kpiMated").innerText = formatToInt(matchedGradeRow[27]);
-                document.getElementById("kpiCr").innerText = formatToInt(matchedGradeRow[28]) + "%";
-                document.getElementById("kpiBirthWt").innerText = formatToInt(matchedGradeRow[29]);
-
-                // 表二搜尋：切換至 A:K 範圍，搜尋欄位鎖定在索引 2 (C 欄，Boar Ear Tag)
-                let matchedSemenRows = dataRows.filter(row => row[2] && row[2].toLowerCase().includes(query));
-
-                const tbody = document.getElementById("extractionTableBody");
-                tbody.innerHTML = "";
-
-                if (matchedSemenRows.length > 0) {
-                    // 依據 Date (索引 0) 進行日期降冪排序，確保最新的在最上面，並嚴格切片取前 10 筆
-                    matchedSemenRows.sort((a, b) => new Date(b[0]) - new Date(a[0]));
-                    let top10 = matchedSemenRows.slice(0, 10);
-
-                    top10.forEach(row => {
-                        let tr = document.createElement("tr");
-                        tr.className = "hover:bg-slate-50 transition-colors";
-                        
-                        // 嚴格對接 A:K 的 11 個目標欄位
-                        let cells = [
-                            row[0] || "-", // Date
-                            row[1] || "-", // Breed
-                            row[2] || "-", // Boar Ear Tag
-                            formatToInt(row[3]), // Volume Collected (ml)
-                            row[4] || "-", // Bau [Odor]
-                            row[5] || "-", // warna [Color]
-                            formatToInt(row[6]), // aktiviti Vitality
-                            formatToInt(row[7]), // Concentration
-                            formatToInt(row[8]), // Morphology Impurities
-                            formatToInt(row[9]), // Volume After Dilution
-                            row[10] || "-" // Other record
-                        ];
-
-                        tr.innerHTML = cells.map(cell => `<td class="p-3 text-slate-700">${cell}</td>`).join('');
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-slate-400 font-semibold bg-slate-50">No extraction history found / Tiada rekod sejarah untuk ID ini.</td></tr>`;
-                }
-            } else {
-                resultsArea.classList.add("hidden");
-                showGlobalStatus("No match found for given Boar ID / ID Boar tidak dijumpai.", "bg-amber-100 text-amber-800");
+            // 渲染公豬表一（4大狀態卡與 Avg TSO）
+            if (json.gradeData) {
+                document.getElementById('tileId').textContent = json.gradeData.tagId;
+                document.getElementById('tileBreed').textContent = json.gradeData.breed;
+                document.getElementById('tileGrade').textContent = json.gradeData.grade;
+                document.getElementById('tileStrategy').textContent = json.gradeData.strategy;
+                document.getElementById('kpiTso').textContent = json.gradeData.avgTso;
+                document.getElementById('gradeModule').style.display = 'block';
             }
-        }
-
-        window.onload = initApplication;
-    </script>
+            
+            // 渲染公豬表二（最近20次歷史紀錄）
+            if (json.historyData && json.historyData.length > 0) {
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = json.historyData.map(row => `
+                    <tr>
+                        <td style="font-weight:800; color:#1E3A8A;">${row[0]}</td>
+                        <td>${row[1]}</td>
+                        <td style="font-weight:700;">${row[2]}</td>
+                        <td class="hl-numeric" style="background:#F0F9FF; font-weight:800;">${row[3]}</td>
+                        <td>${row[4]}</td>
+                        <td>${row[5]}</td>
+                        <td style="font-weight:700; color:#16A34A;">${row[6]}</td>
+                        <td>${row[7]}</td>
+                        <td style="color:#EF4444;">${row[8]}</td>
+                        <td style="background:#F0FDF4; font-weight:800; color:#16A34A;">${row[9]}</td>
+                        <td style="text-align:left; color:#64748B;">${row[10] || '-'}</td>
+                    </tr>
+                `).join('');
+                document.getElementById('historyModule').style.display = 'block';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            statusDiv.style.color = "#EF4444";
+            statusDiv.textContent = "Network Error: Check GAS Deployment Access.";
+        });
+    }
+</script>
 </body>
 </html>
