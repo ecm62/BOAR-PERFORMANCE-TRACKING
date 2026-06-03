@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v8.9 (Diagnostic)</title>
+    <title>GLA Boar Elite v9.0 (Aligned)</title>
     <style>
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
@@ -68,7 +68,6 @@
         tr:hover { background-color: #F8FAFC; }
         .hl-numeric { font-weight: bold; color: #2563EB; }
 
-        /* 診斷警示專用樣式 */
         .diagnostic-alert {
             background-color: #FEF2F2 !important; border: 2px dashed #EF4444 !important;
             color: #991B1B !important; padding: 15px; border-radius: 8px;
@@ -81,13 +80,13 @@
 <div class="container">
     <div class="main-header">
         <h1>GLA BOAR PERFORMANCE ANALYTICS</h1>
-        <p style="opacity: 0.8; font-size: 14px; font-weight: 500;">PhD Standard Swine Breeding Dashboard (Permanently Online)</p>
+        <p style="opacity: 0.8; font-size: 14px; font-weight: 500;">PhD Standard Swine Breeding Dashboard</p>
     </div>
 
     <div class="search-section">
-        <input type="text" id="tagInput" placeholder="SEARCH BOAR ID / CARI ID BOAR (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
+        <input type="text" id="tagInput" placeholder="SEARCH BOAR ID (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
         <button id="searchBtn" onclick="doSearch()">SEARCH</button>
-        <div id="status">System Secure & Ready</div>
+        <div id="status">System Online (v9.0)</div>
     </div>
 
     <div id="diagnosticContainer"></div>
@@ -124,7 +123,8 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzRZwk7jrn25oeIrA9HUkh19KBHK6kRjbxDZjoCiOdFs1SKRGaP3v7LRGTXogzSShM2/exec"; 
+    // 精確對接您剛剛發布的第 8 版全新網址
+    const API_URL = "https://script.google.com/macros/s/AKfycbzJn3TQCCQStnclle5Phj_O3HJkxGvHNBGo6zoKkDGxKT2XvIfHKPhwWS-QEWVwNKs6/exec"; 
 
     function doSearch() {
         const input = document.getElementById('tagInput').value.trim();
@@ -136,11 +136,11 @@
         
         btn.disabled = true;
         statusDiv.style.color = "#EAB308";
-        statusDiv.textContent = "Connecting to Data Warehouse...";
+        statusDiv.textContent = "Querying Database...";
         
         document.getElementById('gradeModule').style.display = 'none';
         document.getElementById('historyModule').style.display = 'none';
-        diagContainer.innerHTML = ""; // 清空上次的診斷
+        diagContainer.innerHTML = ""; 
 
         fetch(`${API_URL}?tag=${encodeURIComponent(input)}`)
         .then(res => res.json())
@@ -153,14 +153,14 @@
             }
 
             statusDiv.style.color = "#10B981";
-            statusDiv.textContent = "Data Successfully Verified.";
+            statusDiv.textContent = "Data Verified.";
 
-            // 🔍 診斷邏輯：如果沒有表一數據，但有表二數據，直接噴出明確警示
+            // 診斷防呆
             if (!json.gradeData && json.historyData && json.historyData.length > 0) {
-                diagContainer.innerHTML = `<div class="diagnostic-alert">⚠️ [DATABASE ALERT] Boar found in Extraction Logs, but GRADE DATABASE (1vK71OXZum2NrDkAPktOVz01-sXoETcdxdrBgC4jtc-c) has NO data for this ID. Please check column X in your Grade Sheet!</div>`;
+                diagContainer.innerHTML = `<div class="diagnostic-alert">⚠️ [DATABASE ALERT] Boar found in Extraction Logs, but BOAR_GRADE_CUMULATIVE sheet has NO data for this ID.</div>`;
             }
 
-            // 渲染公豬表一
+            // 渲染看板
             if (json.gradeData) {
                 document.getElementById('tileId').textContent = json.gradeData.tagId;
                 document.getElementById('tileBreed').textContent = json.gradeData.breed;
@@ -170,7 +170,7 @@
                 document.getElementById('gradeModule').style.display = 'block';
             }
             
-            // 渲染公豬表二
+            // 渲染表格
             if (json.historyData && json.historyData.length > 0) {
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = json.historyData.map(row => `
@@ -194,7 +194,7 @@
         .catch(err => {
             btn.disabled = false;
             statusDiv.style.color = "#EF4444";
-            statusDiv.textContent = "Network Error: Check GAS Deployment Access.";
+            statusDiv.textContent = "Network Error.";
         });
     }
 </script>
