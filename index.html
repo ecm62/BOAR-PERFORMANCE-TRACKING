@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v9.0 (Aligned)</title>
+    <title>GLA Boar Elite v9.5 (Final)</title>
     <style>
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
@@ -80,13 +80,13 @@
 <div class="container">
     <div class="main-header">
         <h1>GLA BOAR PERFORMANCE ANALYTICS</h1>
-        <p style="opacity: 0.8; font-size: 14px; font-weight: 500;">PhD Standard Swine Breeding Dashboard</p>
+        <p style="opacity: 0.8; font-size: 14px; font-weight: 500;">PhD Standard Swine Breeding Dashboard (Permanently Online)</p>
     </div>
 
     <div class="search-section">
-        <input type="text" id="tagInput" placeholder="SEARCH BOAR ID (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
-        <button id="searchBtn" onclick="doSearch()">SEARCH</button>
-        <div id="status">System Online (v9.0)</div>
+        <input type="text" id="tagInput" placeholder="SEARCH BOAR ID / CARI ID BOAR (E.G. 1397)" onkeypress="if(event.key==='Enter') doSearch()">
+        <button id="searchBtn" onclick=" doSearch()">SEARCH</button>
+        <div id="status">System Secure & Ready</div>
     </div>
 
     <div id="diagnosticContainer"></div>
@@ -123,8 +123,8 @@
 </div>
 
 <script>
-    // 精確對接您剛剛發布的第 8 版全新網址
-    const API_URL = "https://script.google.com/macros/s/AKfycbzJn3TQCCQStnclle5Phj_O3HJkxGvHNBGo6zoKkDGxKT2XvIfHKPhwWS-QEWVwNKs6/exec"; 
+    // 鎖定 2026年6月3日 上午 9:47 發布的第 10 版最新網址
+    const API_URL = "https://script.google.com/macros/s/AKfycbzclqTypZTPTfgfOYw-OmyNhGelYUm7iKxDTZLBVP7huzW7t47UUOwbOtQrSf3bGWAy/exec"; 
 
     function doSearch() {
         const input = document.getElementById('tagInput').value.trim();
@@ -136,7 +136,7 @@
         
         btn.disabled = true;
         statusDiv.style.color = "#EAB308";
-        statusDiv.textContent = "Querying Database...";
+        statusDiv.textContent = "Connecting to Data Warehouse...";
         
         document.getElementById('gradeModule').style.display = 'none';
         document.getElementById('historyModule').style.display = 'none';
@@ -153,14 +153,14 @@
             }
 
             statusDiv.style.color = "#10B981";
-            statusDiv.textContent = "Data Verified.";
+            statusDiv.textContent = "Data Successfully Verified.";
 
-            // 診斷防呆
+            // 診斷防呆警示
             if (!json.gradeData && json.historyData && json.historyData.length > 0) {
                 diagContainer.innerHTML = `<div class="diagnostic-alert">⚠️ [DATABASE ALERT] Boar found in Extraction Logs, but BOAR_GRADE_CUMULATIVE sheet has NO data for this ID.</div>`;
             }
 
-            // 渲染看板
+            // 渲染公豬表一（4大狀態卡與 Avg TSO）
             if (json.gradeData) {
                 document.getElementById('tileId').textContent = json.gradeData.tagId;
                 document.getElementById('tileBreed').textContent = json.gradeData.breed;
@@ -170,7 +170,7 @@
                 document.getElementById('gradeModule').style.display = 'block';
             }
             
-            // 渲染表格
+            // 渲染公豬表二（最近20次歷史紀錄）
             if (json.historyData && json.historyData.length > 0) {
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = json.historyData.map(row => `
@@ -194,7 +194,7 @@
         .catch(err => {
             btn.disabled = false;
             statusDiv.style.color = "#EF4444";
-            statusDiv.textContent = "Network Error.";
+            statusDiv.textContent = "Network Error: Check GAS Deployment Access.";
         });
     }
 </script>
