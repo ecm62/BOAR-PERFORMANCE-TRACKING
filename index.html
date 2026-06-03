@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Boar Elite v8.5 (Static)</title>
+    <title>GLA Boar Elite v8.9 (Diagnostic)</title>
     <style>
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
@@ -67,6 +67,13 @@
         td { padding: 12px; text-align: center; border-bottom: 1px solid #F1F5F9; color: #334155; font-family: monospace; }
         tr:hover { background-color: #F8FAFC; }
         .hl-numeric { font-weight: bold; color: #2563EB; }
+
+        /* 診斷警示專用樣式 */
+        .diagnostic-alert {
+            background-color: #FEF2F2 !important; border: 2px dashed #EF4444 !important;
+            color: #991B1B !important; padding: 15px; border-radius: 8px;
+            font-weight: bold; text-align: center; margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -82,6 +89,8 @@
         <button id="searchBtn" onclick="doSearch()">SEARCH</button>
         <div id="status">System Secure & Ready</div>
     </div>
+
+    <div id="diagnosticContainer"></div>
 
     <div id="gradeModule">
         <div class="section-title">I. BOAR GRADE & STRATEGY</div>
@@ -115,13 +124,13 @@
 </div>
 
 <script>
-    // 嚴格鎖定 2026年6月3日 部署的跨表聯檢 GAS 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbzRZwk7jrn25oeIrA9HUkh19KBHK6kRjbxDZjoCiOdFs1SKRGaP3v7LRGTXogzSShM2/exec"; 
 
     function doSearch() {
         const input = document.getElementById('tagInput').value.trim();
         const statusDiv = document.getElementById('status');
         const btn = document.getElementById('searchBtn');
+        const diagContainer = document.getElementById('diagnosticContainer');
 
         if(!input) return;
         
@@ -131,6 +140,7 @@
         
         document.getElementById('gradeModule').style.display = 'none';
         document.getElementById('historyModule').style.display = 'none';
+        diagContainer.innerHTML = ""; // 清空上次的診斷
 
         fetch(`${API_URL}?tag=${encodeURIComponent(input)}`)
         .then(res => res.json())
@@ -145,7 +155,12 @@
             statusDiv.style.color = "#10B981";
             statusDiv.textContent = "Data Successfully Verified.";
 
-            // 渲染公豬表一（4大狀態卡與 Avg TSO）
+            // 🔍 診斷邏輯：如果沒有表一數據，但有表二數據，直接噴出明確警示
+            if (!json.gradeData && json.historyData && json.historyData.length > 0) {
+                diagContainer.innerHTML = `<div class="diagnostic-alert">⚠️ [DATABASE ALERT] Boar found in Extraction Logs, but GRADE DATABASE (1vK71OXZum2NrDkAPktOVz01-sXoETcdxdrBgC4jtc-c) has NO data for this ID. Please check column X in your Grade Sheet!</div>`;
+            }
+
+            // 渲染公豬表一
             if (json.gradeData) {
                 document.getElementById('tileId').textContent = json.gradeData.tagId;
                 document.getElementById('tileBreed').textContent = json.gradeData.breed;
@@ -155,7 +170,7 @@
                 document.getElementById('gradeModule').style.display = 'block';
             }
             
-            // 渲染公豬表二（最近20次歷史紀錄）
+            // 渲染公豬表二
             if (json.historyData && json.historyData.length > 0) {
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = json.historyData.map(row => `
